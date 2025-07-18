@@ -1,20 +1,13 @@
-name: Build APK (Local Build)
+name: Build Watch Translator APK
 
 on:
   workflow_dispatch:
-    inputs:
-      build_type:
-        description: 'Build type'
-        required: true
-        default: 'debug'
-        type: choice
-        options:
-        - debug
-        - release
+  push:
+    branches: [ main ]
 
 jobs:
   build:
-    name: Build APK Locally
+    name: Build APK
     runs-on: ubuntu-latest
     
     steps:
@@ -35,59 +28,50 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Install dependencies
-      run: |
-        npm install --legacy-peer-deps --no-package-lock
-        npm install -g @expo/cli
+    - name: Install Expo CLI
+      run: npm install -g @expo/cli
 
-    - name: Create Android project
+    - name: Install project dependencies
       run: |
-        npx create-expo-app --template blank-typescript temp-project
-        cp -r * temp-project/ || true
-        cd temp-project
+        npm install --force
         npx expo install --fix
 
-    - name: Prebuild Android
-      run: |
-        cd temp-project
-        npx expo prebuild --platform android --clear
+    - name: Generate Android project
+      run: npx expo prebuild --platform android --clear
 
-    - name: Build APK
+    - name: Make gradlew executable
+      run: chmod +x android/gradlew
+
+    - name: Build Debug APK
       run: |
-        cd temp-project/android
-        ./gradlew assembleDebug
+        cd android
+        ./gradlew assembleDebug --no-daemon
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: watch-translator-apk
-        path: temp-project/android/app/build/outputs/apk/debug/app-debug.apk
+        name: watch-translator-debug-apk
+        path: android/app/build/outputs/apk/debug/app-debug.apk
 
-    - name: Create release info
+    - name: Create build summary
       run: |
-        echo "# Watch Translator APK Ready!" > release-info.md
-        echo "" >> release-info.md
-        echo "**Build Date:** $(date)" >> release-info.md
-        echo "**File:** app-debug.apk" >> release-info.md
-        echo "**Size:** ~25-30MB" >> release-info.md
-        echo "" >> release-info.md
-        echo "## Installation Instructions:" >> release-info.md
-        echo "1. Download the APK from the Artifacts section above" >> release-info.md
-        echo "2. Transfer to your Samsung Watch" >> release-info.md
-        echo "3. Enable 'Install from unknown sources'" >> release-info.md
-        echo "4. Install the APK" >> release-info.md
-        echo "5. Grant microphone permissions when prompted" >> release-info.md
-        echo "" >> release-info.md
-        echo "## App Features:" >> release-info.md
-        echo "- 🎤 Voice translation (Tagalog → English)" >> release-info.md
-        echo "- 📱 Watch-optimized interface" >> release-info.md
-        echo "- 👆 Gesture controls (swipe, double-tap)" >> release-info.md
-        echo "- 📚 Offline dictionary fallback" >> release-info.md
-        echo "- 📝 Translation history" >> release-info.md
-        echo "- ⚡ Performance optimized" >> release-info.md
-
-    - name: Upload release info
-      uses: actions/upload-artifact@v4
-      with:
-        name: release-info
-        path: release-info.md
+        echo "# 🎉 Watch Translator APK Built Successfully!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 📱 Download Instructions:" >> $GITHUB_STEP_SUMMARY
+        echo "1. Scroll down to **Artifacts** section" >> $GITHUB_STEP_SUMMARY
+        echo "2. Download **watch-translator-debug-apk**" >> $GITHUB_STEP_SUMMARY
+        echo "3. Extract the ZIP file to get app-debug.apk" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 🔧 Installation on Samsung Watch:" >> $GITHUB_STEP_SUMMARY
+        echo "1. Transfer APK to your watch via ADB or file manager" >> $GITHUB_STEP_SUMMARY
+        echo "2. Enable 'Install from unknown sources' in watch settings" >> $GITHUB_STEP_SUMMARY
+        echo "3. Install the APK file" >> $GITHUB_STEP_SUMMARY
+        echo "4. Grant microphone permissions when prompted" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## ✨ Features Included:" >> $GITHUB_STEP_SUMMARY
+        echo "- 🎤 Voice translation (Tagalog → English)" >> $GITHUB_STEP_SUMMARY
+        echo "- 📱 Watch-optimized UI" >> $GITHUB_STEP_SUMMARY
+        echo "- 👆 Gesture controls (swipe, double-tap)" >> $GITHUB_STEP_SUMMARY
+        echo "- 📚 Offline dictionary fallback" >> $GITHUB_STEP_SUMMARY
+        echo "- 📝 Translation history with caching" >> $GITHUB_STEP_SUMMARY
+        echo "- ⚡ Performance optimized for watch hardware" >> $GITHUB_STEP_SUMMARY
