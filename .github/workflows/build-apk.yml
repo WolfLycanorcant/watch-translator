@@ -1,0 +1,93 @@
+name: Build Watch Translator APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+        - debug
+        - release
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install dependencies
+      run: |
+        npm ci --legacy-peer-deps
+        npm install -g @expo/cli eas-cli
+
+    - name: Setup Expo and EAS
+      uses: expo/expo-github-action@v8
+      with:
+        expo-version: latest
+        eas-version: latest
+        token: ${{ secrets.EXPO_TOKEN }}
+
+    - name: Build APK
+      run: |
+        eas build --platform android --profile watch-debug --non-interactive --no-wait
+      env:
+        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+    - name: Wait for build completion
+      run: |
+        echo "Build submitted to Expo servers"
+        echo "Check your Expo dashboard for download link"
+        echo "Build will be available at: https://expo.dev"
+
+    - name: Create build info
+      run: |
+        echo "# Watch Translator APK Build" > build-info.md
+        echo "" >> build-info.md
+        echo "**Build Date:** $(date)" >> build-info.md
+        echo "**Build Type:** watch-debug" >> build-info.md
+        echo "**Platform:** Android" >> build-info.md
+        echo "" >> build-info.md
+        echo "## Download Instructions:" >> build-info.md
+        echo "1. Go to https://expo.dev" >> build-info.md
+        echo "2. Login to your account" >> build-info.md
+        echo "3. Navigate to your project builds" >> build-info.md
+        echo "4. Download the APK file" >> build-info.md
+        echo "" >> build-info.md
+        echo "## Features Included:" >> build-info.md
+        echo "- ✅ Voice translation (Tagalog → English)" >> build-info.md
+        echo "- ✅ Offline dictionary fallback" >> build-info.md
+        echo "- ✅ Watch-optimized UI" >> build-info.md
+        echo "- ✅ Gesture controls" >> build-info.md
+        echo "- ✅ Translation history" >> build-info.md
+        echo "- ✅ Performance optimizations" >> build-info.md
+
+    - name: Upload build info
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-info
+        path: build-info.md

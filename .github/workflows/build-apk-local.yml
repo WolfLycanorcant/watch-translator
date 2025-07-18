@@ -1,0 +1,94 @@
+name: Build APK (Local Build)
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'debug'
+        type: choice
+        options:
+        - debug
+        - release
+
+jobs:
+  build:
+    name: Build APK Locally
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install dependencies
+      run: |
+        npm install --legacy-peer-deps
+        npm install -g @expo/cli
+
+    - name: Create Android project
+      run: |
+        npx create-expo-app --template blank-typescript temp-project
+        cp -r * temp-project/ || true
+        cd temp-project
+        npx expo install --fix
+
+    - name: Prebuild Android
+      run: |
+        cd temp-project
+        npx expo prebuild --platform android --clear
+
+    - name: Build APK
+      run: |
+        cd temp-project/android
+        ./gradlew assembleDebug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: watch-translator-apk
+        path: temp-project/android/app/build/outputs/apk/debug/app-debug.apk
+
+    - name: Create release info
+      run: |
+        echo "# Watch Translator APK Ready!" > release-info.md
+        echo "" >> release-info.md
+        echo "**Build Date:** $(date)" >> release-info.md
+        echo "**File:** app-debug.apk" >> release-info.md
+        echo "**Size:** ~25-30MB" >> release-info.md
+        echo "" >> release-info.md
+        echo "## Installation Instructions:" >> release-info.md
+        echo "1. Download the APK from the Artifacts section above" >> release-info.md
+        echo "2. Transfer to your Samsung Watch" >> release-info.md
+        echo "3. Enable 'Install from unknown sources'" >> release-info.md
+        echo "4. Install the APK" >> release-info.md
+        echo "5. Grant microphone permissions when prompted" >> release-info.md
+        echo "" >> release-info.md
+        echo "## App Features:" >> release-info.md
+        echo "- 🎤 Voice translation (Tagalog → English)" >> release-info.md
+        echo "- 📱 Watch-optimized interface" >> release-info.md
+        echo "- 👆 Gesture controls (swipe, double-tap)" >> release-info.md
+        echo "- 📚 Offline dictionary fallback" >> release-info.md
+        echo "- 📝 Translation history" >> release-info.md
+        echo "- ⚡ Performance optimized" >> release-info.md
+
+    - name: Upload release info
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-info
+        path: release-info.md

@@ -1,0 +1,38 @@
+{
+  "build": {
+    "watch-debug": {
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleDebug",
+        "distribution": "internal",
+        "env": {
+          "NODE_ENV": "development"
+        }
+      }
+    },
+    "watch-release": {
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease",
+        "distribution": "internal",
+        "env": {
+          "NODE_ENV": "production"
+        }
+      }
+    },
+    "production": {
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease",
+        "releaseChannel": "production",
+        "distribution": "internal"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  },
+  "cli": {
+    "version": ">= 3.0.0"
+  }
+}
