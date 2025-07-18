@@ -1,0 +1,89 @@
+name: Build Flutter Watch Translator APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths: 
+      - 'watch_translator_flutter/**'
+
+jobs:
+  build:
+    name: Build Flutter APK
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+        channel: 'stable'
+
+    - name: Install Flutter dependencies
+      run: |
+        cd watch_translator_flutter
+        flutter pub get
+
+    - name: Build Debug APK
+      run: |
+        cd watch_translator_flutter
+        flutter build apk --debug
+
+    - name: Build Release APK
+      run: |
+        cd watch_translator_flutter
+        flutter build apk --release
+
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: watch-translator-flutter-debug-apk
+        path: watch_translator_flutter/build/app/outputs/flutter-apk/app-debug.apk
+
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: watch-translator-flutter-release-apk
+        path: watch_translator_flutter/build/app/outputs/flutter-apk/app-release.apk
+
+    - name: Create build summary
+      run: |
+        echo "# 🎉 Flutter Watch Translator APK Built Successfully!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 📱 Download Your APK:" >> $GITHUB_STEP_SUMMARY
+        echo "1. Scroll down to **Artifacts** section" >> $GITHUB_STEP_SUMMARY
+        echo "2. Download either:" >> $GITHUB_STEP_SUMMARY
+        echo "   - **watch-translator-flutter-debug-apk** (for testing)" >> $GITHUB_STEP_SUMMARY
+        echo "   - **watch-translator-flutter-release-apk** (optimized)" >> $GITHUB_STEP_SUMMARY
+        echo "3. Extract the ZIP file to get the APK" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 🔧 Installation on Samsung Watch:" >> $GITHUB_STEP_SUMMARY
+        echo "1. Transfer APK to your watch via ADB or file manager" >> $GITHUB_STEP_SUMMARY
+        echo "2. Enable 'Install from unknown sources' in watch settings" >> $GITHUB_STEP_SUMMARY
+        echo "3. Install the APK file" >> $GITHUB_STEP_SUMMARY
+        echo "4. Grant microphone permissions when prompted" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## ✨ Flutter App Features:" >> $GITHUB_STEP_SUMMARY
+        echo "- 🎤 **Voice Translation** (Tagalog → English)" >> $GITHUB_STEP_SUMMARY
+        echo "- 📱 **Watch-Optimized UI** (responsive design)" >> $GITHUB_STEP_SUMMARY
+        echo "- 👆 **Double-tap Controls** (start/stop recording)" >> $GITHUB_STEP_SUMMARY
+        echo "- 📚 **Offline Dictionary** (50+ common phrases)" >> $GITHUB_STEP_SUMMARY
+        echo "- 📝 **Translation History** (persistent storage)" >> $GITHUB_STEP_SUMMARY
+        echo "- 🔊 **Text-to-Speech** (speaks translations)" >> $GITHUB_STEP_SUMMARY
+        echo "- 📳 **Haptic Feedback** (vibration on actions)" >> $GITHUB_STEP_SUMMARY
+        echo "- ⚡ **Performance Optimized** (for watch hardware)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 📊 Build Info:" >> $GITHUB_STEP_SUMMARY
+        echo "- **Framework:** Flutter 3.24.0" >> $GITHUB_STEP_SUMMARY
+        echo "- **Target:** Android Wear OS / Samsung Watch" >> $GITHUB_STEP_SUMMARY
+        echo "- **Size:** ~15-20MB (much smaller than React Native)" >> $GITHUB_STEP_SUMMARY
+        echo "- **Performance:** Native compilation for better speed" >> $GITHUB_STEP_SUMMARY
