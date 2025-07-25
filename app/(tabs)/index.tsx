@@ -11,17 +11,18 @@ import {
 } from 'react-native';
 import { useWatchVoiceInput } from '@/hooks/useWatchVoiceInput';
 import { useTranslationHistory } from '@/hooks/useTranslationHistory';
+import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 import { WatchButton } from '@/components/WatchButton';
 import { WatchGestureHandler } from '@/components/WatchGestureHandler';
 import { HistoryItem } from '@/components/HistoryItem';
 import { Mic, MicOff, RotateCcw } from 'lucide-react-native';
-
-const { width } = Dimensions.get('window');
-const isSmallScreen = width < 200; // Watch screen detection
+import { IS_SMALL_SCREEN } from '@/lib/constants';
 
 export default function HomeScreen() {
-  const { 
-    isListening, 
+  const { startRender, endRender } = usePerformanceMonitor('HomeScreen');
+
+  const {
+    isListening,
     isProcessing,
     error,
     transcript,
@@ -30,6 +31,12 @@ export default function HomeScreen() {
     stopListening,
     reset
   } = useWatchVoiceInput();
+
+  // Performance monitoring
+  useEffect(() => {
+    startRender();
+    return () => endRender();
+  });
   
   const { 
     recentItems, 
@@ -133,8 +140,8 @@ export default function HomeScreen() {
     return (
       <View style={styles.statusContainer}>
         <Text style={styles.instructionText}>
-          {isSmallScreen 
-            ? 'Double tap to start' 
+          {IS_SMALL_SCREEN
+            ? 'Double tap to start'
             : 'Tap the button or double tap to start recording'
           }
         </Text>
@@ -161,7 +168,7 @@ export default function HomeScreen() {
       onDoubleTap={handleDoubleTap}
     >
       <View style={styles.container}>
-        {!isSmallScreen && (
+        {!IS_SMALL_SCREEN && (
           <View style={styles.header}>
             <Text style={styles.title}>Translator</Text>
             {isListening ? (
@@ -186,11 +193,12 @@ export default function HomeScreen() {
             disabled={isProcessing}
           />
           
-          {!isSmallScreen && error && (
+          {!IS_SMALL_SCREEN && error && (
             <WatchButton
               label="Reset"
               onPress={handleReset}
-              style={styles.resetButton}
+              variant="secondary"
+              size="small"
             />
           )}
         </View>
@@ -227,7 +235,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: isSmallScreen ? 8 : 16,
+    padding: IS_SMALL_SCREEN ? 8 : 16,
     backgroundColor: '#171717',
   },
   header: {
@@ -238,12 +246,12 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#FFFFFF',
-    fontSize: isSmallScreen ? 18 : 24,
+    fontSize: IS_SMALL_SCREEN ? 18 : 24,
     fontWeight: 'bold',
   },
   statusContainer: {
     marginBottom: 16,
-    minHeight: isSmallScreen ? 60 : 80,
+    minHeight: IS_SMALL_SCREEN ? 60 : 80,
     justifyContent: 'center',
   },
   processingContainer: {
@@ -251,65 +259,44 @@ const styles = StyleSheet.create({
   },
   statusText: {
     color: '#A3A3A3',
-    fontSize: isSmallScreen ? 14 : 16,
+    fontSize: IS_SMALL_SCREEN ? 14 : 16,
     textAlign: 'center',
     marginTop: 8,
   },
   instructionText: {
     color: '#A3A3A3',
-    fontSize: isSmallScreen ? 12 : 14,
+    fontSize: IS_SMALL_SCREEN ? 12 : 14,
     textAlign: 'center',
     fontStyle: 'italic',
   },
   errorText: {
     color: '#ef4444',
-    fontSize: isSmallScreen ? 14 : 16,
+    fontSize: IS_SMALL_SCREEN ? 14 : 16,
     textAlign: 'center',
     marginBottom: 8,
   },
   originalText: {
     color: '#A3A3A3',
-    fontSize: isSmallScreen ? 12 : 14,
+    fontSize: IS_SMALL_SCREEN ? 12 : 14,
     textAlign: 'center',
     marginBottom: 4,
   },
   translationText: {
     color: '#FFFFFF',
-    fontSize: isSmallScreen ? 16 : 20,
+    fontSize: IS_SMALL_SCREEN ? 16 : 20,
     fontWeight: '500',
     textAlign: 'center',
   },
   buttonContainer: {
-    flexDirection: isSmallScreen ? 'column' : 'row',
+    flexDirection: IS_SMALL_SCREEN ? 'column' : 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
     gap: 8,
   },
-  mainButton: {
-    minWidth: isSmallScreen ? 80 : 120,
-    minHeight: isSmallScreen ? 40 : 64,
-  },
-  listeningButton: {
-    backgroundColor: '#ef4444',
-  },
-  disabledButton: {
-    backgroundColor: '#666',
-    opacity: 0.6,
-  },
-  resetButton: {
-    backgroundColor: '#666',
-    minWidth: isSmallScreen ? 60 : 80,
-    minHeight: isSmallScreen ? 32 : 48,
-  },
-  smallButton: {
-    minWidth: 60,
-    minHeight: 32,
-    alignSelf: 'center',
-  },
   historyTitle: {
     color: '#FFFFFF',
-    fontSize: isSmallScreen ? 14 : 18,
+    fontSize: IS_SMALL_SCREEN ? 14 : 18,
     fontWeight: '500',
     marginBottom: 12,
   },
@@ -320,6 +307,6 @@ const styles = StyleSheet.create({
     color: '#A3A3A3',
     textAlign: 'center',
     marginTop: 16,
-    fontSize: isSmallScreen ? 12 : 14,
+    fontSize: IS_SMALL_SCREEN ? 12 : 14,
   },
 });

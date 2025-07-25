@@ -5,19 +5,46 @@
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
-    "build": "eas build --platform android --profile watch-debug"
+    "build": "node scripts/optimize-build.js",
+    "build:release": "node scripts/optimize-build.js --release",
+    "build:simple": "eas build --platform android --profile watch-debug",
+    "build:local": "eas build --platform android --profile watch-debug --local",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "clean": "rm -rf node_modules && rm -rf .expo && rm -rf .metro-cache && npm install",
+    "clean:cache": "rm -rf .expo && rm -rf .metro-cache",
+    "analyze": "npx expo install --fix && npm audit",
+    "prepare": "npm run type-check && npm run lint"
   },
   "dependencies": {
     "expo": "~51.0.0",
     "expo-router": "~3.5.0",
     "expo-status-bar": "~1.12.0",
+    "expo-av": "~14.0.0",
+    "expo-speech": "~12.0.0",
+    "expo-haptics": "~13.0.0",
+    "expo-build-properties": "~0.12.0",
+    "expo-font": "~12.0.0",
+    "expo-web-browser": "~13.0.0",
+    "@react-native-async-storage/async-storage": "1.23.1",
     "react": "18.2.0",
     "react-native": "0.74.0",
     "react-native-safe-area-context": "4.10.0",
-    "react-native-screens": "3.31.0"
+    "react-native-screens": "~3.31.0",
+    "react-native-gesture-handler": "~2.16.1",
+    "react-native-reanimated": "~3.10.1",
+    "lucide-react-native": "^0.400.0",
+    "date-fns": "^3.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "typescript": "~5.3.3"
+    "@babel/plugin-transform-runtime": "^7.24.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
+    "typescript": "~5.3.3",
+    "@types/react": "~18.2.79"
   }
 }

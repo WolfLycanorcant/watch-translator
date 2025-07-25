@@ -2,8 +2,9 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
 import * as FileSystem from 'expo-file-system';
-import { translateText } from '@/lib/translation';
 import * as Haptics from 'expo-haptics';
+import { translateText } from '@/lib/translation';
+import { API_CONFIG } from '@/lib/constants';
 
 interface VoiceInputState {
   isListening: boolean;
@@ -11,6 +12,13 @@ interface VoiceInputState {
   error: string | null;
   transcript: string | null;
   translation: string | null;
+  confidence?: number;
+}
+
+interface VoiceInputOptions {
+  autoStop?: boolean;
+  maxDuration?: number;
+  enableHaptics?: boolean;
 }
 
 export function useWatchVoiceInput() {

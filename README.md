@@ -1,15 +1,19 @@
 # Watch Translator
 
-A voice translation app optimized for Samsung Watch and Android Wear devices. Translates Tagalog speech to English with offline fallback support.
+A high-performance voice translation app optimized for Samsung Watch and Android Wear devices. Translates Tagalog speech to English with advanced offline capabilities and intelligent caching.
 
-## Features
+## ✨ Features
 
-- 🎤 **Voice Translation**: Speak in Tagalog, get English translation
-- 📱 **Watch Optimized**: Designed for small screens and touch interfaces
-- 👆 **Gesture Controls**: Swipe and double-tap navigation
-- 📚 **Offline Support**: Built-in dictionary for common phrases
-- 📝 **History**: Save and review past translations
-- ⚡ **Performance**: Optimized for watch hardware and battery life
+- 🎤 **Voice Translation**: Real-time Tagalog to English translation
+- 📱 **Watch Optimized**: Responsive design for small screens (< 200px)
+- 👆 **Advanced Gestures**: Swipe, double-tap, and long-press navigation
+- 📚 **Smart Offline Mode**: Intelligent fallback with 70+ common phrases
+- 📝 **Translation History**: Persistent storage with search capabilities
+- ⚡ **Performance Optimized**: Memory management and bundle optimization
+- 🔄 **Multi-Service Fallback**: Google Translate + LibreTranslate APIs
+- 🎯 **Accessibility**: Full screen reader and haptic feedback support
+- 🧠 **Intelligent Caching**: LRU cache with automatic cleanup
+- 🔧 **Error Recovery**: Comprehensive error boundaries and retry logic
 
 ## Quick Start
 
@@ -56,25 +60,88 @@ A voice translation app optimized for Samsung Watch and Android Wear devices. Tr
 - Listen to English translation
 - View text in history
 
-## Technical Details
+## 🏗️ Technical Architecture
 
+### Core Technologies
 - **Platform**: Android Wear OS / Samsung Watch
-- **Framework**: React Native with Expo
-- **Size**: ~25-30MB
-- **Permissions**: Microphone, Internet (optional)
-- **Offline**: Works without internet using built-in dictionary
+- **Framework**: React Native 0.74 with Expo 51
+- **Language**: TypeScript with strict type checking
+- **State Management**: Custom hooks with optimized re-renders
+- **Gestures**: React Native Gesture Handler v2
+- **Audio**: Expo AV with optimized recording settings
+- **Storage**: AsyncStorage with intelligent caching layer
 
-## Development
+### Performance Optimizations
+- **Bundle Size**: ~20-25MB (optimized from 30MB+)
+- **Memory Management**: LRU caching with automatic cleanup
+- **Render Optimization**: Memoized components and callbacks
+- **Bundle Splitting**: Metro configuration for tree shaking
+- **Hermes Engine**: Enabled for faster startup and lower memory
+- **Proguard**: Enabled for release builds with resource shrinking
 
+### Offline Capabilities
+- **Dictionary**: 70+ common Tagalog phrases with fuzzy matching
+- **Caching**: Intelligent translation caching with 24h expiry
+- **Fallback Chain**: Local dictionary → Cache → Online APIs
+- **Partial Matching**: Word-by-word translation for unknown phrases
+
+## 🛠️ Development
+
+### Quick Start
 ```bash
 # Install dependencies
 npm install
 
 # Start development server
-npx expo start
+npm start
 
-# Build APK
-eas build --platform android --profile watch-debug
+# Run on Android device/emulator
+npm run android
+```
+
+### Building
+```bash
+# Optimized build with full analysis
+npm run build
+
+# Release build
+npm run build:release
+
+# Simple build (no optimization)
+npm run build:simple
+
+# Local build (no cloud)
+npm run build:local
+```
+
+### Testing & Quality
+```bash
+# Run tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint
+
+# Fix linting issues
+npm run lint:fix
+```
+
+### Performance Optimization
+```bash
+# Clean all caches
+npm run clean
+
+# Clean build caches only
+npm run clean:cache
+
+# Analyze bundle and dependencies
+npm run analyze
 ```
 
 ## Supported Phrases
